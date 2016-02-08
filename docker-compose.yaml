@@ -1,0 +1,89 @@
+api:
+  image: stackstorm/st2api
+  links:
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - st2-data
+
+auth:
+  image: stackstorm/st2auth
+  links:
+    - api
+    - mongo
+  volumes:
+    - ./auth/htpasswd:/etc/st2/htpasswd:ro
+  volumes_from:
+    - st2-data
+
+notifier:
+  image: stackstorm/st2notifier
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - st2-data
+
+resultstracker:
+  image: stackstorm/st2resultstracker
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - st2-data
+
+rulesengine:
+  image: stackstorm/st2rulesengine
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - st2-data
+
+sensorcontainer:
+  image: stackstorm/st2sensorcontainer
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - st2-data
+
+actionrunner:
+  image: stackstorm/st2actionrunner
+  links:
+    - api
+    - mongo
+    - rabbitmq
+  volumes_from:
+    - st2-data
+
+web:
+  build: ./web
+  links:
+    - api
+    - auth
+  ports:
+    - 80:80
+    - 443:443
+
+## External Services
+mongo:
+  image: mongo
+
+rabbitmq:
+  image: rabbitmq
+
+## Data container
+st2-data:
+  image: stackstorm/st2actionrunner
+  volumes:
+    - /etc/st2
+    - /opt/stackstorm/packs
+  links:
+    - rabbitmq
+    - mongo
+  entrypoint: st2-register-content --config-file /etc/st2/st2.conf
