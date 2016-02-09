@@ -4,7 +4,7 @@ api:
     - mongo
     - rabbitmq
   volumes_from:
-    - st2-data
+    - data
 
 auth:
   image: stackstorm/st2auth
@@ -14,7 +14,7 @@ auth:
   volumes:
     - ./auth/htpasswd:/etc/st2/htpasswd:ro
   volumes_from:
-    - st2-data
+    - data
 
 notifier:
   image: stackstorm/st2notifier
@@ -23,7 +23,7 @@ notifier:
     - mongo
     - rabbitmq
   volumes_from:
-    - st2-data
+    - data
 
 resultstracker:
   image: stackstorm/st2resultstracker
@@ -32,7 +32,7 @@ resultstracker:
     - mongo
     - rabbitmq
   volumes_from:
-    - st2-data
+    - data
 
 rulesengine:
   image: stackstorm/st2rulesengine
@@ -41,7 +41,7 @@ rulesengine:
     - mongo
     - rabbitmq
   volumes_from:
-    - st2-data
+    - data
 
 sensorcontainer:
   image: stackstorm/st2sensorcontainer
@@ -50,16 +50,16 @@ sensorcontainer:
     - mongo
     - rabbitmq
   volumes_from:
-    - st2-data
+    - data
 
 actionrunner:
-  image: stackstorm/st2actionrunner
+  build: ./actionrunner #[inline]
   links:
     - api
     - mongo
     - rabbitmq
   volumes_from:
-    - st2-data
+    - data
 
 web:
   build: ./web
@@ -78,12 +78,11 @@ rabbitmq:
   image: rabbitmq
 
 ## Data container
-st2-data:
-  image: stackstorm/st2actionrunner
+data:
+  build: ./data
   volumes:
     - /etc/st2
     - /opt/stackstorm/packs
   links:
     - rabbitmq
     - mongo
-  entrypoint: st2-register-content --config-file /etc/st2/st2.conf
