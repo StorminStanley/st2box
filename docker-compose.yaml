@@ -70,6 +70,12 @@ web:
     - 80:80
     - 443:443
 
+client:
+  build: ./client
+  links:
+    - api
+    - auth
+
 ## External Services
 mongo:
   image: mongo
