@@ -80,6 +80,17 @@ client:
     - api
     - auth
 
+chatops:
+  build: ./chatops
+  links:
+    - web
+  environment:
+    ST2_HOSTNAME: web
+    ST2_AUTH_USERNAME: admin
+    ST2_AUTH_PASSWORD: 123
+    HUBOT_ADAPTER: slack
+    HUBOT_SLACK_TOKEN: xoxb-change-me
+
 ## External Services
 mongo:
   image: mongo
