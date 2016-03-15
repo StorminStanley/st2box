@@ -58,8 +58,12 @@ actionrunner:
     - api
     - mongo
     - rabbitmq
+    - web
   volumes_from:
     - data
+  environment:
+    ST2_ACTION_API_URL: https://web/api
+    ST2_ACTION_AUTH_URL: https://web/auth
 
 web:
   build: ./web
@@ -88,7 +92,7 @@ data:
   build: ./data
   volumes:
     - /etc/st2
-    - /opt/stackstorm/packs
+    - /opt/stackstorm
   links:
     - rabbitmq
     - mongo
