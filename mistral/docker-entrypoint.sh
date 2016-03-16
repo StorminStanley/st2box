@@ -28,8 +28,19 @@ populate_db() {
     sleep 1
   done
 
-  /opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf upgrade head
-  /opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf populate
+  /opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf upgrade head 2>/dev/null
+  if [ "$?" -ne 0 ]; then
+    echo Mistral DB migration failed
+  else
+    echo Mistral DB migration succeeded
+  fi
+
+  /opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf populate 2>/dev/null
+  if [ "$?" -ne 0 ]; then
+    echo Mistral DB has not been populated
+  else
+    echo Mistral DB has been populated successfully
+  fi
 }
 
 case "$MISTRAL_SERVICE" in
