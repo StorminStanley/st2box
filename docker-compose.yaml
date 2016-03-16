@@ -58,8 +58,12 @@ actionrunner:
     - api
     - mongo
     - rabbitmq
+    - web
   volumes_from:
     - data
+  environment:
+    ST2_ACTION_API_URL: https://web/api
+    ST2_ACTION_AUTH_URL: https://web/auth
 
 web:
   build: ./web
@@ -76,6 +80,17 @@ client:
     - api
     - auth
 
+chatops:
+  build: ./chatops
+  links:
+    - web
+  environment:
+    ST2_HOSTNAME: web
+    ST2_AUTH_USERNAME: admin
+    ST2_AUTH_PASSWORD: 123
+    HUBOT_ADAPTER: slack
+    HUBOT_SLACK_TOKEN: xoxb-change-me
+
 ## External Services
 mongo:
   image: mongo
@@ -88,7 +103,7 @@ data:
   build: ./data
   volumes:
     - /etc/st2
-    - /opt/stackstorm/packs
+    - /opt/stackstorm
   links:
     - rabbitmq
     - mongo

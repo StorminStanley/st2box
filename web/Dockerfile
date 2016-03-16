@@ -1,5 +1,5 @@
 FROM nginx
-ADD ./nginx.conf /etc/nginx/nginx.conf
+ADD ./st2.conf /etc/nginx/conf.d/st2.conf
 
 ADD ./st2*.deb /tmp/
 RUN dpkg -i /tmp/st2*.deb && rm -r /tmp/* && apt-get clean
