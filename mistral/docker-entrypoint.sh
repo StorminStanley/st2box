@@ -1,18 +1,18 @@
 #!/bin/sh
 
+POSTGRES_USER=${POSTGRES_USER:-mistral}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-StackStorm}
+POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+POSTGRES_DB=${POSTGRES_DB:-mistral}
+
+RABBITMQ_USER=${RABBITMQ_USER:-guest}
+RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
+RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+
 # Generate config file
 generate_config_file() {
   # Configuration has been already altered, so skip generation!
   (md5sum --quiet -c /mistral.conf.orig.md5) || return 0
-
-  POSTGRES_USER=${POSTGRES_USER:-mistral}
-  POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-StackStorm}
-  POSTGRES_HOST=${POSTGRES_HOST:-postgres}
-  POSTGRES_DB=${POSTGRES_DB:-mistral}
-
-  RABBITMQ_USER=${RABBITMQ_USER:-guest}
-  RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
-  RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
 
   cat /mistral.conf.template \
     | sed -r "s|^(connection.=.).*|\1postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST/$POSTGRES_DB|" \
@@ -23,6 +23,11 @@ generate_config_file() {
 generate_config_file
 
 populate_db() {
+  until nc -z $POSTGRES_HOST 5432; do
+    echo "PostgreSQL doesn't respond. Waiting..."
+    sleep 1
+  done
+
   /opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf upgrade head
   /opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf populate
 }
