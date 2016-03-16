@@ -3,6 +3,7 @@ api:
   links:
     - mongo
     - rabbitmq
+    - mistral-api
   volumes_from:
     - data
 
@@ -31,6 +32,7 @@ resultstracker:
     - api
     - mongo
     - rabbitmq
+    - mistral-api
   volumes_from:
     - data
 
@@ -59,6 +61,7 @@ actionrunner:
     - mongo
     - rabbitmq
     - web
+    - mistral-api
   volumes_from:
     - data
   environment:
@@ -91,12 +94,44 @@ chatops:
     HUBOT_ADAPTER: slack
     HUBOT_SLACK_TOKEN: xoxb-change-me
 
+## Mistral Services
+
+mistral-api:
+  build: ./mistral
+  environment:
+    MISTRAL_SERVICE: api
+  links:
+    - postgres
+    - rabbitmq
+
+mistral-engine:
+  build: ./mistral
+  environment:
+    MISTRAL_SERVICE: engine
+  links:
+    - postgres
+    - rabbitmq
+
+mistral-executor:
+  build: ./mistral
+  environment:
+    MISTRAL_SERVICE: executor
+  links:
+    - rabbitmq
+    - api
+
 ## External Services
 mongo:
   image: mongo
 
 rabbitmq:
   image: rabbitmq
+
+postgres:
+  image: postgres
+  environment:
+    - POSTGRES_USER=mistral
+    - POSTGRES_PASSWORD=StackStorm
 
 ## Data container
 data:
