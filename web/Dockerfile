@@ -1,4 +1,4 @@
-FROM nginx
+FROM nginx:1.11
 ADD ./st2.conf /etc/nginx/conf.d/st2.conf
 
 ADD ./st2*.deb /tmp/
